@@ -1,22 +1,16 @@
-// src/app/page.tsx
-
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    fetch("/api")
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message));
-  }, []);
-
   return (
-    <div>
-      <div>한국어: 도커 배포</div>
-      <div>영어: {message}</div>
+    <div className="relative border  w-full md:w-1/2 lg:w-1/3 aspect-video">
+      <Image
+        src="https://images.unsplash.com/photo-1726066012801-14d892021339"
+        alt="Responsive image"
+        fill
+        className="object-cover"
+      />
     </div>
   );
 }

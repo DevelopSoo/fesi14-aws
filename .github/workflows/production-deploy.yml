@@ -1,0 +1,45 @@
+# production-deploy.yml
+
+name: Production 수동 배포
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "배포할 빌드 워크플로우의 Run ID (비우면 가장 최근 성공한 빌드 사용)"
+        required: false
+        type: string
+jobs:
+  Deploy-Production:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Vercel CLI 설치
+        run: npm install --global vercel@latest
+
+      - name: 빌드 결과물 다운로드 (특정 Run ID)
+        if: ${{ inputs.run_id != '' }}
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          name: vercel-build-output
+          run_id: ${{ inputs.run_id }}
+
+      - name: 빌드 결과물 다운로드 (최근 성공 빌드)
+        if: ${{ inputs.run_id == '' }}
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: production-build.yml
+          name: vercel-build-output
+          workflow_conclusion: success
+
+      - name: 빌드 결과물 압축 해제
+        run: tar -xzvf vercel-output.tar.gz
+
+      - name: Vercel에 배포
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
