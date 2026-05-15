@@ -9,7 +9,6 @@ export default function Home() {
         src="https://images.unsplash.com/photo-1726066012801-14d892021339"
         alt="Responsive image"
         fill
-        className="object-cover"
       />
     </div>
   );
